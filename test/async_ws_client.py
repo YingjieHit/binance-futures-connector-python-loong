@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 
 from binance.websocket.async_websocket_client import AsyncWebsocketClient
@@ -10,19 +11,27 @@ logging.basicConfig(level=logging.INFO)
 TEST_WEBSOCKET_URL = "wss://stream.binance.com:9443/ws"
 
 
+async def handle_message(msg):
+    data = json.loads(msg)
+    print(data)
+
+
 async def test_websocket_subscribe():
     # 创建客户端实例
-    client = AsyncWebsocketClient(stream_url=TEST_WEBSOCKET_URL)
+    client = AsyncWebsocketClient(stream_url=TEST_WEBSOCKET_URL,
+
+
+                                  )
 
     # 定义消息处理函数，输出接收到的数据
     client.handle_message = lambda msg: print("Received message:", msg)
 
+    # 启动客户端并连接
+    await client.start()
+    print("订阅行情")
     # 发送订阅请求
     await client.subscribe('bnbbtc@ticker')
     await client.subscribe('ethbtc@ticker')
-
-    # 启动客户端并连接
-    await client.start()
 
     # 等待一些时间以接收消息
     await asyncio.sleep(10)  # 等待10秒以便接收一些消息
